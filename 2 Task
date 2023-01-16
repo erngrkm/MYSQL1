@@ -1,0 +1,37 @@
+1-)2022 Kasım ayı için her provider'ın lead sayısının kategori (venue - big 5 - others) lead ortalamasına oranı
+
+
+select R.y,c/avv from (select providers.id as y, count(*) as c,providers.category_id, b.category_group from providers left join leads on providers.id=
+    leads.provider_id join (select pc.id,pc.name,pc.category_type,
+      case when pc.category_type = 'venue' then 'Venue' else
+          case when c.type is not null then 'Big 5' else 'Others' end end as category_group
+from provider_category as pc
+left join category_city_settings as c on c.provider_category_id = pc.id and c.type = 'primary_service_categories') as
+    b on b.id=providers.category_id where providers.created_at between '01.11.2022' and '30.11.2022'  group by providers.id
+) as R left join  (select category_group,avg(c) as avv from (select providers.id as y, count(*) as c,providers.category_id, b.category_group from providers left join leads on providers.id=
+    leads.provider_id join (select pc.id,pc.name,pc.category_type,
+      case when pc.category_type = 'venue' then 'Venue' else
+          case when c.type is not null then 'Big 5' else 'Others' end end as category_group
+from provider_category as pc
+left join category_city_settings as c on c.provider_category_id = pc.id and c.type = 'primary_service_categories') as
+    b on b.id=providers.category_id where providers.created_at between '01.11.2022' and '30.11.2022'  group by providers.id
+) as T  group by T.category_group) as K on K.category_group=R.category_group group by R.y
+
+
+2-)provider tablosunda yıl - ay bazında KUMULATİF provider sayısı(SELF JOIN)
+
+select t1.yearmonth,sum(t2.prov_count) from (select concat(year(created_at),LPAD(month(created_at), 2, '0')) as yearmonth,count(1) as prov_count from providers
+group by concat(year(created_at),LPAD(month(created_at), 2, '0'))) as t1 join (select concat(year(created_at),LPAD(month(created_at), 2, '0')) as yearmonth,count(1) as prov_count from providers
+group by concat(year(created_at),LPAD(month(created_at), 2, '0'))) as t2 on t1.yearmonth>=t2.yearmonth group by  t1.yearmonth order by  t1.yearmonth
+
+select concat(year(created_at),LPAD(month(created_at), 2, '0')) as yearmonth,count(1) as prov_count from providers
+group by concat(year(created_at),LPAD(month(created_at), 2, '0')) >>>>> YEAR-MONTH birleştirme
+concat(year(gen_date),LPAD(month(gen_date), 2, '0'))
+
+
+3-)
+
+                                                                                                       
+                                                                                                       
+
+
